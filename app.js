@@ -3,6 +3,10 @@ testTransofrmReqIfToSpecIf = (ReqIfDocument) => {
     specIfObject = {};
 
     specIfObject.dataTypes = extractSpecifDatatypesFromXmlDoc(element.getElementsByTagName("DATATYPES"));
+    specIfObject.propertyClasses = extractSpecifPropertyClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
+    specIfObject.resourceClasses = extractSpecifResourceClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
+    specIfObject.statementClasses = extractSpecifStatementClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
+    specIfObject.resources = extractSpecifResourcesFromXmlDoc(element.getElementsByTagName("SPEC-OBJECTS"));
     
     return specIfObject
 }
@@ -57,32 +61,93 @@ extractSpecIfValue = (valueDocument) => {
 
 }
 
-extractSpecifPropertyClassesFromXmlDoc = (XmlDocPropertyClasses) => {
-    result = [];
-    propertyClassesArray = extractElementsOutOfHtmlCollection(XmlDocPropertyClasses[0].children)
-    result.push({})
-    return result;
+extractSpecifPropertyClassesFromXmlDoc = (XmlSpecTypeDocument) => {
+    specifPropertyClassesArray = [];
+    specificationArray = extractElementsOutOfHtmlCollection(XmlSpecTypeDocument[0].children)
+    propertyClassArray = specificationArray.filter(specType => isPropertyClass(specType))
+    propertyClassArray.forEach( propertyClassDocument => {
+        specifPropertyClassesArray.push(extractSpecIfProptertyClass(propertyClassDocument))
+    })
+    return specifPropertyClassesArray;
 }
 
-extractSpecifResourceClassesFromXmlDoc = (XmlDocResourceClasses) => {
-    result = [];
-    resourceClassesArray = extractElementsOutOfHtmlCollection(XmlDocResourceClasses[0].children)
-    result.push({})
-    return result;
+extractSpecIfProptertyClass = (propertyClassDocument) => {
+    specifPropertyClass = {};
+    specifPropertyClass.id = propertyClassDocument.getAttribute("IDENTIFIER")
+    specifPropertyClass.description = propertyClassDocument.getAttribute("DESC")
+    return specifPropertyClass;
 }
 
-extractSpecifStatementClassesFromXmlDoc = (XmlDocStatementClasses) => {
-    result = [];
-    statementClassesArray = extractElementsOutOfHtmlCollection(XmlDocStatementClasses[0].children)
-    result.push({})
-    return result;
+extractSpecifResourceClassesFromXmlDoc = (XmlSpecTypeDocument) => {
+    specifResourceClassesArray = [];
+    specificationArray = extractElementsOutOfHtmlCollection(XmlSpecTypeDocument[0].children)
+    resourceClassArray = specificationArray.filter(specType => isResourceClass(specType))
+    resourceClassArray.forEach( resourceClassDocument => {
+        specifResourceClassesArray.push(extractSpecIfResourceClass(resourceClassDocument))
+    })
+    return specifResourceClassesArray;
+}
+
+extractSpecIfResourceClass = (resourceClassDocument) => {
+    specifResourceClass = {};
+    specifResourceClass.id = resourceClassDocument.getAttribute("IDENTIFIER")
+    specifResourceClass.title = resourceClassDocument.getAttribute("LONG-NAME")
+    specifResourceClass.description = resourceClassDocument.getAttribute("DESC")
+    //specifResourceClass.icon = resourceClassDocument.getAttribute("")
+    //specifResourceClass.instantiation = resourceClassDocument.getAttribute("")
+    //specifResourceClass.propertyClasses = resourceClassDocument.getAttribute("")
+    specifResourceClass.changedAt = resourceClassDocument.getAttribute("LAST-CHANGE")
+    specifResourceClass.description = resourceClassDocument.getAttribute("DESC")
+    return specifResourceClass;
+}
+
+extractSpecifStatementClassesFromXmlDoc = (XmlSpecTypeDocument) => {
+    specifStatementClassesArray = [];
+    specificationArray = extractElementsOutOfHtmlCollection(XmlSpecTypeDocument[0].children)
+    statementClassArray = specificationArray.filter(specType => isStatementClass(specType))
+    statementClassArray.forEach( statementClassDocument => {
+        specifStatementClassesArray.push(extractSpecIfStatementClass(statementClassDocument))
+    })
+    return specifStatementClassesArray;
+}
+
+extractSpecIfStatementClass = (statementClassDocument) => {
+    specifStatementClass = {};
+    specifStatementClass.id = statementClassDocument.getAttribute("IDENTIFIER")
+    specifStatementClass.title = statementClassDocument.getAttribute("LONG-NAME")
+    specifStatementClass.description = statementClassDocument.getAttribute("DESC")
+    //specifStatementClass.instantiation = statementClassDocument.getAttribute("DESC")
+    //specifStatementClass.revision = statementClassDocument.getAttribute("DESC")
+    specifStatementClass.changedAt = statementClassDocument.getAttribute("LAST-CHANGE")
+    //specifStatementClass.subjectClasses = statementClassDocument.getAttribute("DESC")
+    //specifStatementClass.objectClasses = statementClassDocument.getAttribute("DESC")
+    return specifStatementClass;
 }
 
 extractSpecifResourcesFromXmlDoc = (XmlDocResources) => {
-    result = [];
+    specifResourcesArray = [];
     resourcesArray = extractElementsOutOfHtmlCollection(XmlDocResources[0].children)
-    result.push({})
-    return result;
+    resourcesArray.forEach( resourceDocument => {
+        specifResourcesArray.push(extractSpecIfResource(resourceDocument))
+    })
+    return specifResourcesArray;
+}
+
+extractSpecIfResource = (resourceDocument) => {
+    specifResource = {};
+    resourceDocument.getAttribute("IDENTIFIER") ? specifResource.id = resourceDocument.getAttribute("IDENTIFIER") : '';
+    resourceDocument.getAttribute("LONG-NAME") ? specifResource.title = resourceDocument.getAttribute("LONG-NAME") : '';
+    resourceDocument.childElementCount ? specifResource.class = resourceDocument.children[0].children[0].innerHTML : '';
+    resourceDocument.getAttribute("") ? specifResource.revision = resourceDocument.getAttribute("") : '';
+    resourceDocument.getAttribute("LAST-CHANGE") ? specifResource.changedAt = resourceDocument.getAttribute("LAST-CHANGE") : '';
+    resourceDocument.getAttribute("") ? specifResource.changedBy = resourceDocument.getAttribute("") : '';
+    resourceDocument.childElementCount>1 ? specifResource.properties = extractResourceProperties(resourceDocument.children[1]) : '';
+
+    return specifResource;
+}
+
+extractResourceProperties = () => {
+
 }
 
 extractSpecifStatementsFromXmlDoc = (XmlDocStatements) => {
@@ -128,8 +193,24 @@ extractElementsOutOfHtmlCollection = (htmlCollection) => {
     return result;
 }
 
+isPropertyClass = (classDocument) => {
+    return classDocument.getAttribute("IDENTIFIER").toString().startsWith("PC");
+}
+
+isResourceClass = (classDocument) => {
+    return classDocument.getAttribute("IDENTIFIER").toString().startsWith("RC");
+}
+
+isStatementClass = (classDocument) => {
+    return classDocument.getAttribute("IDENTIFIER").toString().startsWith("SC");
+}
+
 getXmlDocument = () => {
     return extractXmlDocFromString(getInputValue())
+}
+
+getTagFromXmlDocument = (tagName) => {
+    return getXmlDocument().getElementsByTagName(tagName)
 }
 
 
