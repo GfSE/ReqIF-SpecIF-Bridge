@@ -7,6 +7,7 @@ testTransofrmReqIfToSpecIf = (ReqIfDocument) => {
     specIfObject.resourceClasses = extractSpecifResourceClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
     specIfObject.statementClasses = extractSpecifStatementClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
     specIfObject.resources = extractSpecifResourcesFromXmlDoc(element.getElementsByTagName("SPEC-OBJECTS"));
+    specIfObject.statements = extractSpecifStatementsFromXmlDoc(element.getElementsByTagName("SPEC-RELATIONS"));
     
     return specIfObject
 }
@@ -151,10 +152,25 @@ extractResourceProperties = () => {
 }
 
 extractSpecifStatementsFromXmlDoc = (XmlDocStatements) => {
-    result = [];
+    specifStatementsArray = [];
     statementsArray = extractElementsOutOfHtmlCollection(XmlDocStatements[0].children)
-    result.push({})
-    return result;
+    statementsArray.forEach( statementDocument => {
+        specifStatementsArray.push(extractSpecIfStatement(statementDocument));
+    }) 
+    return specifStatementsArray;
+}
+
+extractSpecIfStatement = (statementDocument) => {
+    specifStatement = {};
+    statementDocument.getAttribute("IDENTIFIER") ? specifStatement.id = statementDocument.getAttribute("IDENTIFIER") : '';
+    statementDocument.children[0] ? specifStatement.class = statementDocument.getElementsByTagName("TYPE")[0].children[0].innerHTML : '';
+    statementDocument.getAttribute("") ? specifStatement.revision = statementDocument.getAttribute("") : '';
+    statementDocument.getAttribute("LAST-CHANGE") ? specifStatement.changedAt = statementDocument.getAttribute("LAST-CHANGE") : '';
+    statementDocument.getAttribute("") ? specifStatement.changedBy = statementDocument.getAttribute("") : '';
+    statementDocument.children[2] ? specifStatement.subject = statementDocument.getElementsByTagName("SOURCE")[0].children[0].innerHTML : '';
+    statementDocument.children[3] ? specifStatement.object = statementDocument.getElementsByTagName("TARGET")[0].children[0].innerHTML : '';
+    
+    return specifStatement;
 }
 
 extractSpecifHierarchiesFromXmlDoc = (XmlDocHierarchies) => {
