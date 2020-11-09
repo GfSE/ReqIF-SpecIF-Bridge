@@ -8,7 +8,7 @@ testTransofrmReqIfToSpecIf = (ReqIfDocument) => {
     specIfObject.statementClasses = extractSpecifStatementClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
     specIfObject.resources = extractSpecifResourcesFromXmlDoc(element.getElementsByTagName("SPEC-OBJECTS"));
     specIfObject.statements = extractSpecifStatementsFromXmlDoc(element.getElementsByTagName("SPEC-RELATIONS"));
-    
+    specIfObject.hierarchies = extractSpecifHierarchiesFromXmlDoc(element.getElementsByTagName("SPECIFICATIONS"));
     return specIfObject
 }
 
@@ -138,7 +138,7 @@ extractSpecIfResource = (resourceDocument) => {
     specifResource = {};
     resourceDocument.getAttribute("IDENTIFIER") ? specifResource.id = resourceDocument.getAttribute("IDENTIFIER") : '';
     resourceDocument.getAttribute("LONG-NAME") ? specifResource.title = resourceDocument.getAttribute("LONG-NAME") : '';
-    resourceDocument.childElementCount ? specifResource.class = resourceDocument.children[0].children[0].innerHTML : '';
+    resourceDocument.getElementsByTagName("TYPE")[0] ? specifResource.class = resourceDocument.getElementsByTagName("TYPE")[0].children[0].innerHTML : '';
     resourceDocument.getAttribute("") ? specifResource.revision = resourceDocument.getAttribute("") : '';
     resourceDocument.getAttribute("LAST-CHANGE") ? specifResource.changedAt = resourceDocument.getAttribute("LAST-CHANGE") : '';
     resourceDocument.getAttribute("") ? specifResource.changedBy = resourceDocument.getAttribute("") : '';
@@ -163,28 +163,57 @@ extractSpecifStatementsFromXmlDoc = (XmlDocStatements) => {
 extractSpecIfStatement = (statementDocument) => {
     specifStatement = {};
     statementDocument.getAttribute("IDENTIFIER") ? specifStatement.id = statementDocument.getAttribute("IDENTIFIER") : '';
-    statementDocument.children[0] ? specifStatement.class = statementDocument.getElementsByTagName("TYPE")[0].children[0].innerHTML : '';
+    statementDocument.getElementsByTagName("TYPE")[0] ? specifStatement.class = statementDocument.getElementsByTagName("TYPE")[0].children[0].innerHTML : '';
     statementDocument.getAttribute("") ? specifStatement.revision = statementDocument.getAttribute("") : '';
     statementDocument.getAttribute("LAST-CHANGE") ? specifStatement.changedAt = statementDocument.getAttribute("LAST-CHANGE") : '';
     statementDocument.getAttribute("") ? specifStatement.changedBy = statementDocument.getAttribute("") : '';
-    statementDocument.children[2] ? specifStatement.subject = statementDocument.getElementsByTagName("SOURCE")[0].children[0].innerHTML : '';
-    statementDocument.children[3] ? specifStatement.object = statementDocument.getElementsByTagName("TARGET")[0].children[0].innerHTML : '';
+    statementDocument.getElementsByTagName("SOURCE")[0] ? specifStatement.subject = statementDocument.getElementsByTagName("SOURCE")[0].children[0].innerHTML : '';
+    statementDocument.getElementsByTagName("TARGET")[0] ? specifStatement.object = statementDocument.getElementsByTagName("TARGET")[0].children[0].innerHTML : '';
     
     return specifStatement;
 }
 
 extractSpecifHierarchiesFromXmlDoc = (XmlDocHierarchies) => {
-    result = [];
     hierarchiesArray = extractElementsOutOfHtmlCollection(XmlDocHierarchies[0].children)
-    result.push({})
-    return result;
+    rootElement = hierarchiesArray[0]
+    specifHierarchiesArray = extractSpecIfSubNodes(rootElement)
+    
+    return specifHierarchiesArray;
+}
+
+extractSpecIfSubNodes = (rootElement) => {
+    let specifNodesArray = [];
+    childrenDocElement = getChildNodeswithTag(rootElement, "CHILDREN")[0];
+    if(childrenDocElement != undefined){
+        hierarchyDocumentsArray = extractElementsOutOfHtmlCollection(childrenDocElement.children)
+        hierarchyDocumentsArray.forEach( hierarchyDocument => {
+            specifNodesArray.push(extractSpecIfHierarchy(hierarchyDocument))
+        })
+    }
+    return specifNodesArray;
+}
+
+
+
+extractSpecIfHierarchy = (hierarchyDocument) => {
+    let specIfHierarchy = {};
+    specIfHierarchy.id = hierarchyDocument.getAttribute("IDENTIFIER");
+    specIfHierarchy.resource = hierarchyDocument.getElementsByTagName("OBJECT")[0].firstElementChild.innerHTML;
+    specIfHierarchy.revision = '';
+    specIfHierarchy.changedAt = hierarchyDocument.getAttribute("LAST-CHANGE");
+    let specifSubnodesArray = extractSpecIfSubNodes(hierarchyDocument);
+    specifSubnodesArray.length ? specIfHierarchy.nodes = specifSubnodesArray : '';
+    return specIfHierarchy;
 }
 
 extractSpecifFilesFromXmlDoc = (XmlDocFiles) => {
-    result = [];
+    let specIfFilesArray = [];
     filesArray = extractElementsOutOfHtmlCollection(XmlDocFiles[0].children)
-    result.push({})
-    return result;
+    filesArray.forEach( fileDocument => {
+        specIfFilesArray.push(extractSpecIfFile(fileDocument))
+    })
+    
+    return specIfFilesArray;
 }
 
 
@@ -229,6 +258,9 @@ getTagFromXmlDocument = (tagName) => {
     return getXmlDocument().getElementsByTagName(tagName)
 }
 
+getChildNodeswithTag = (parentDocument, tagName) => {
+    return extractElementsOutOfHtmlCollection(parentDocument.children).filter(element => {return element.tagName == tagName})
+}
 
 /* 
 ############################ UI ###########################################
