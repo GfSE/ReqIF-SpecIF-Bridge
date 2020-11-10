@@ -212,10 +212,13 @@ extractSpecifFilesFromXmlDoc = (XmlDocFiles) => {
     filesArray.forEach( fileDocument => {
         specIfFilesArray.push(extractSpecIfFile(fileDocument))
     })
-    
     return specIfFilesArray;
 }
 
+extractSpecIfFile = (fileDocument) => {
+    let specIfFile = {}
+    fileDocument
+}
 
 /* 
 ##########################################################################
@@ -262,19 +265,45 @@ getChildNodeswithTag = (parentDocument, tagName) => {
     return extractElementsOutOfHtmlCollection(parentDocument.children).filter(element => {return element.tagName == tagName})
 }
 
+extractSpecAttributes = (specTypesDocument) => {
+    StringsSpecification = extractSpecAttributeStringsMap(specTypesDocument);
+    XHTMLSpecification = extractSpecAttributeXHTMLMap(specTypesDocument);
+    EnumsSpecification = extractSpecAttributeEnumsMap(specTypesDocument);
+    return Object.assign({}, StringsSpecification, XHTMLSpecification, EnumsSpecification);
+}
+
+extractSpecAttributeStringsMap = (specTypesDocument) => {
+    return extractSpecAttributeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-STRING");
+}
+
+extractSpecAttributeXHTMLMap = (specTypesDocument) => {
+    return extractSpecAttributeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-XHTML");
+}
+
+extractSpecAttributeEnumsMap = (specTypesDocument) => {
+    return extractSpecAttributeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-ENUMERATION");
+}
+
+extractSpecAttributeMap = (specTypesDocument, tagName) => {
+    let attributeDefinition = specTypesDocument.getElementsByTagName(tagName)
+    let attributeDefinitionArray = extractElementsOutOfHtmlCollection(attributeDefinition)
+    let attributeDefinitionMap = {}
+    attributeDefinitionArray.forEach(definition => attributeDefinitionMap[definition.getAttribute("IDENTIFIER")]=[definition.getAttribute("LONG-NAME"),definition.children[0].children[0].innerHTML] );
+    return attributeDefinitionMap
+}
 /* 
 ############################ UI ###########################################
  */
 
 getInputValue = () => {
-    element = document.getElementById('input');
+    let element = document.getElementById('input');
     return element.value;
 }
 
 transform = () => {
     input = getInputValue();
     specIf = testTransofrmReqIfToSpecIf(input);
-    element = document.getElementById('output');
+    let element = document.getElementById('output');
     element.innerHTML=JSON.stringify(specIf, null, '\t');
 }
 
