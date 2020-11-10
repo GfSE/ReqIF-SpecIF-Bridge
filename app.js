@@ -64,11 +64,10 @@ extractSpecIfValue = (valueDocument) => {
 
 extractSpecifPropertyClassesFromXmlDoc = (XmlSpecTypeDocument) => {
     specifPropertyClassesArray = [];
-    specificationArray = extractElementsOutOfHtmlCollection(XmlSpecTypeDocument[0].children)
-    propertyClassArray = specificationArray.filter(specType => isPropertyClass(specType))
-    propertyClassArray.forEach( propertyClassDocument => {
-        specifPropertyClassesArray.push(extractSpecIfProptertyClass(propertyClassDocument))
-    })
+
+    specAttributesMap = extractSpecAttributesMap(XmlSpecTypeDocument[0])
+    specifPropertyClassesArray = extractPropertyClassesFromSpecAttributeMap(specAttributesMap)
+    
     return specifPropertyClassesArray;
 }
 
@@ -193,8 +192,6 @@ extractSpecIfSubNodes = (rootElement) => {
     return specifNodesArray;
 }
 
-
-
 extractSpecIfHierarchy = (hierarchyDocument) => {
     let specIfHierarchy = {};
     specIfHierarchy.id = hierarchyDocument.getAttribute("IDENTIFIER");
@@ -265,7 +262,7 @@ getChildNodeswithTag = (parentDocument, tagName) => {
     return extractElementsOutOfHtmlCollection(parentDocument.children).filter(element => {return element.tagName == tagName})
 }
 
-extractSpecAttributes = (specTypesDocument) => {
+extractSpecAttributesMap = (specTypesDocument) => {
     StringsSpecification = extractSpecAttributeStringsMap(specTypesDocument);
     XHTMLSpecification = extractSpecAttributeXHTMLMap(specTypesDocument);
     EnumsSpecification = extractSpecAttributeEnumsMap(specTypesDocument);
@@ -273,23 +270,38 @@ extractSpecAttributes = (specTypesDocument) => {
 }
 
 extractSpecAttributeStringsMap = (specTypesDocument) => {
-    return extractSpecAttributeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-STRING");
+    return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-STRING");
 }
 
 extractSpecAttributeXHTMLMap = (specTypesDocument) => {
-    return extractSpecAttributeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-XHTML");
+    return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-XHTML");
 }
 
 extractSpecAttributeEnumsMap = (specTypesDocument) => {
-    return extractSpecAttributeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-ENUMERATION");
+    return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-ENUMERATION");
 }
 
-extractSpecAttributeMap = (specTypesDocument, tagName) => {
+extractSpecAttributeTypeMap = (specTypesDocument, tagName) => {
     let attributeDefinition = specTypesDocument.getElementsByTagName(tagName)
     let attributeDefinitionArray = extractElementsOutOfHtmlCollection(attributeDefinition)
     let attributeDefinitionMap = {}
-    attributeDefinitionArray.forEach(definition => attributeDefinitionMap[definition.getAttribute("IDENTIFIER")]=[definition.getAttribute("LONG-NAME"),definition.children[0].children[0].innerHTML] );
+    attributeDefinitionArray.forEach(definition => {
+        attributeDefinitionMap[definition.getAttribute("IDENTIFIER")]={ 
+                                                                        id : definition.getAttribute("LONG-NAME"),
+                                                                        dataType : definition.children[0].children[0].innerHTML,
+                                                                        changedAt : definition.getAttribute("LAST-CHANGE"),
+
+                                                                    } 
+                                                        });
     return attributeDefinitionMap
+}
+
+extractPropertyClassesFromSpecAttributeMap = (specAttributeMap) =>{
+    specAttributeMapArray = Object.entries(specAttributeMap).map( e => e[1])
+    propertyClassesObject = {}
+    specAttributeMapArray.forEach(specification => propertyClassesObject[specification.id] = {dataType : specification.dataType, changedAt : specification.changedAt})
+    propertyClasses = Object.entries(propertyClassesObject).map( entry => { return {id: entry[0] , title : "", dataType : entry[1].dataType, changedAt : entry[1].changedAt } })
+    return propertyClasses;
 }
 /* 
 ############################ UI ###########################################
