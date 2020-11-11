@@ -1,7 +1,7 @@
 testTransofrmReqIfToSpecIf = (ReqIfDocument) => {
     element = extractXmlDocFromString(ReqIfDocument);
     specIfObject = {};
-
+    specIfObject = extractMainSpecifProperties(element.getElementsByTagName("DATATYPES"));
     specIfObject.dataTypes = extractSpecifDatatypesFromXmlDoc(element.getElementsByTagName("DATATYPES"));
     specIfObject.propertyClasses = extractSpecifPropertyClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
     specIfObject.resourceClasses = extractSpecifResourceClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
@@ -18,6 +18,11 @@ extractSpecIfFromXmlDoc = (xmlDoc) => {
     return result;
 }
 
+extractMainSpecifProperties = (XmlDocReqIfHeader) => {
+    specIfProeprties = {};
+    return specIfProeprties;
+}
+
 extractSpecifDatatypesFromXmlDoc = (XmlDocDatatypes) => {
     specIfDatatypes = [];
     datatypesArray = extractElementsOutOfHtmlCollection(XmlDocDatatypes[0].children)
@@ -31,13 +36,13 @@ extractSpecifDatatype = (datatype) => {
     specifDatatype = {};
     datatype.getAttribute("IDENTIFIER") ? specifDatatype.id = datatype.getAttribute("IDENTIFIER") : '';
     datatype.getAttribute("LONG-NAME") ? specifDatatype.title = datatype.getAttribute("LONG-NAME") : '';
-    datatype.getAttribute("") ? specifDatatype.type = datatype.getAttribute("") : '';
-    datatype.getAttribute("") ? specifDatatype.revision = datatype.getAttribute("") : '';
+    datatype.getAttribute("") ? specifDatatype.type = datatype.getAttribute("") : specifDatatype.type = 'xs:string';
+    datatype.getAttribute("") ? specifDatatype.revision = datatype.getAttribute("") : specifDatatype.revision = "0";
     datatype.getAttribute("DESC") ? specifDatatype.description = datatype.getAttribute("DESC") : '';
     datatype.getAttribute("LAST-CHANGE") ? specifDatatype.changedAt = datatype.getAttribute("LAST-CHANGE") : '';
-    datatype.getAttribute("MIN") ? specifDatatype.minInclusive = datatype.getAttribute("MIN") : '';
-    datatype.getAttribute("MAX") ? specifDatatype.maxInclusive = datatype.getAttribute("MAX") : '';
-    datatype.getAttribute("MAX-LENGTH") ? specifDatatype.maxLength = datatype.getAttribute("MAX-LENGTH") : '';
+    datatype.getAttribute("MIN") ? specifDatatype.minInclusive = Number(datatype.getAttribute("MIN")) : '';
+    datatype.getAttribute("MAX") ? specifDatatype.maxInclusive = Number(datatype.getAttribute("MAX")) : '';
+    datatype.getAttribute("MAX-LENGTH") ? specifDatatype.maxLength = Number(datatype.getAttribute("MAX-LENGTH")) : '';
     datatype.getAttribute("") ? specifDatatype.fractionDigits = datatype.getAttribute("") : '';
     datatype.childElementCount ? specifDatatype.values = extractDataTypeValues(datatype.children) : '';
 
@@ -116,8 +121,8 @@ extractSpecIfStatementClass = (statementClassDocument) => {
     specifStatementClass.id = statementClassDocument.getAttribute("IDENTIFIER")
     specifStatementClass.title = statementClassDocument.getAttribute("LONG-NAME")
     specifStatementClass.description = statementClassDocument.getAttribute("DESC")
-    //specifStatementClass.instantiation = statementClassDocument.getAttribute("DESC")
-    //specifStatementClass.revision = statementClassDocument.getAttribute("DESC")
+    specifStatementClass.instantiation = ["auto"]
+    specifStatementClass.revision = "0";
     specifStatementClass.changedAt = statementClassDocument.getAttribute("LAST-CHANGE")
     //specifStatementClass.subjectClasses = statementClassDocument.getAttribute("DESC")
     //specifStatementClass.objectClasses = statementClassDocument.getAttribute("DESC")
@@ -138,7 +143,7 @@ extractSpecIfResource = (resourceDocument) => {
     resourceDocument.getAttribute("IDENTIFIER") ? specifResource.id = resourceDocument.getAttribute("IDENTIFIER") : '';
     resourceDocument.getAttribute("LONG-NAME") ? specifResource.title = resourceDocument.getAttribute("LONG-NAME") : '';
     resourceDocument.getElementsByTagName("TYPE")[0] ? specifResource.class = resourceDocument.getElementsByTagName("TYPE")[0].children[0].innerHTML : '';
-    resourceDocument.getAttribute("") ? specifResource.revision = resourceDocument.getAttribute("") : '';
+    resourceDocument.getAttribute("") ? specifResource.revision = resourceDocument.getAttribute("") : specifResource.revision = "0";
     resourceDocument.getAttribute("LAST-CHANGE") ? specifResource.changedAt = resourceDocument.getAttribute("LAST-CHANGE") : '';
     resourceDocument.getAttribute("") ? specifResource.changedBy = resourceDocument.getAttribute("") : '';
     resourceDocument.childElementCount>1 ? specifResource.properties = extractResourceProperties(resourceDocument.children[1]) : '';
@@ -163,7 +168,7 @@ extractSpecIfStatement = (statementDocument) => {
     specifStatement = {};
     statementDocument.getAttribute("IDENTIFIER") ? specifStatement.id = statementDocument.getAttribute("IDENTIFIER") : '';
     statementDocument.getElementsByTagName("TYPE")[0] ? specifStatement.class = statementDocument.getElementsByTagName("TYPE")[0].children[0].innerHTML : '';
-    statementDocument.getAttribute("") ? specifStatement.revision = statementDocument.getAttribute("") : '';
+    statementDocument.getAttribute("") ? specifStatement.revision = statementDocument.getAttribute("") : specifStatement.revision = "0";
     statementDocument.getAttribute("LAST-CHANGE") ? specifStatement.changedAt = statementDocument.getAttribute("LAST-CHANGE") : '';
     statementDocument.getAttribute("") ? specifStatement.changedBy = statementDocument.getAttribute("") : '';
     statementDocument.getElementsByTagName("SOURCE")[0] ? specifStatement.subject = statementDocument.getElementsByTagName("SOURCE")[0].children[0].innerHTML : '';
@@ -196,7 +201,7 @@ extractSpecIfHierarchy = (hierarchyDocument) => {
     let specIfHierarchy = {};
     specIfHierarchy.id = hierarchyDocument.getAttribute("IDENTIFIER");
     specIfHierarchy.resource = hierarchyDocument.getElementsByTagName("OBJECT")[0].firstElementChild.innerHTML;
-    specIfHierarchy.revision = '';
+    specIfHierarchy.revision = "0";
     specIfHierarchy.changedAt = hierarchyDocument.getAttribute("LAST-CHANGE");
     let specifSubnodesArray = extractSpecIfSubNodes(hierarchyDocument);
     specifSubnodesArray.length ? specIfHierarchy.nodes = specifSubnodesArray : '';
@@ -297,7 +302,7 @@ extractSpecAttributeTypeMap = (specTypesDocument, tagName) => {
 }
 
 extractPropertyClassesFromSpecAttributeMap = (specAttributeMap) =>{
-    specAttributeMapArray = Object.entries(specAttributeMap).map( e => e[1])
+    specAttributeMapArray = Object.entries(specAttributeMap).map( keyValuePair => keyValuePair[1])
     propertyClassesObject = {}
     specAttributeMapArray.forEach(specification => propertyClassesObject[specification.id] = {dataType : specification.dataType, changedAt : specification.changedAt})
     propertyClasses = Object.entries(propertyClassesObject).map( entry => { return {id: entry[0] , title : "", dataType : entry[1].dataType, changedAt : entry[1].changedAt } })
