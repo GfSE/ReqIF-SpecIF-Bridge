@@ -1,7 +1,7 @@
 testTransofrmReqIfToSpecIf = (ReqIfDocument) => {
     element = extractXmlDocFromString(ReqIfDocument);
     specIfObject = {};
-    specIfObject = extractMainSpecifProperties(element.getElementsByTagName("DATATYPES"));
+    specIfObject = extractMainSpecifProperties(element.getElementsByTagName("REQ-IF-HEADER"));
     specIfObject.dataTypes = extractSpecifDatatypesFromXmlDoc(element.getElementsByTagName("DATATYPES"));
     specIfObject.propertyClasses = extractSpecifPropertyClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
     specIfObject.resourceClasses = extractSpecifResourceClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
@@ -20,6 +20,30 @@ extractSpecIfFromXmlDoc = (xmlDoc) => {
 
 extractMainSpecifProperties = (XmlDocReqIfHeader) => {
     specIfProeprties = {};
+    specIfProeprties.id = XmlDocReqIfHeader[0].getAttribute("IDENTIFIER");
+    specIfProeprties.title = XmlDocReqIfHeader[0].getElementsByTagName("TITLE")[0].innerHTML;
+    specIfProeprties.description = XmlDocReqIfHeader[0].getElementsByTagName("COMMENT")[0].innerHTML;
+    specIfProeprties.$schema = "https://specif.de/v1.0/schema.json";
+    specIfProeprties.generator = "ReqIf-SpecIf Bridge";
+    specIfProeprties.generatorVersion = "0.0.1-Alpha";
+    specIfProeprties.rights = {
+            "title": "Creative Commons 4.0 CC BY-SA",
+            "type": "dcterms:rights",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+        }
+    specIfProeprties.createdAt = XmlDocReqIfHeader[0].getElementsByTagName("CREATION-TIME")[0].innerHTML;
+    specIfProeprties.createdBy = {
+            "familyName": "von Dungern",
+            "givenName": "Oskar",
+            "email": {
+                "type": "text/html",
+                "value": "oskar.dungern@adesso.de"
+            },
+            "org": {
+                "organizationName": "adesso"
+            }
+        };
+
     return specIfProeprties;
 }
 
