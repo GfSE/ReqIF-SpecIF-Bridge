@@ -1,4 +1,4 @@
-testTransofrmReqIfToSpecIf = (ReqIfDocument) => {
+testTransofrmReqIfToSpecIf = (ReqIfDocument) => {               //Typo
     element = extractXmlDocFromString(ReqIfDocument);
     specIfObject = {};
     specIfObject = extractMainSpecifProperties(element.getElementsByTagName("REQ-IF-HEADER"));
@@ -60,7 +60,10 @@ extractSpecifDatatype = (datatype) => {
     specifDatatype = {};
     datatype.getAttribute("IDENTIFIER") ? specifDatatype.id = datatype.getAttribute("IDENTIFIER") : '';
     datatype.getAttribute("LONG-NAME") ? specifDatatype.title = datatype.getAttribute("LONG-NAME") : '';
-    datatype.getAttribute("") ? specifDatatype.type = datatype.getAttribute("") : specifDatatype.type = 'xs:string';
+
+    //datatype.getAttribute("") ? specifDatatype.type = datatype.getAttribute("") : specifDatatype.type = 'xs:string';
+    specifDatatype.type = getTypeOfDatatype(datatype);
+
     datatype.getAttribute("") ? specifDatatype.revision = datatype.getAttribute("") : specifDatatype.revision = "0";
     datatype.getAttribute("DESC") ? specifDatatype.description = datatype.getAttribute("DESC") : '';
     datatype.getAttribute("LAST-CHANGE") ? specifDatatype.changedAt = datatype.getAttribute("LAST-CHANGE") : '';
@@ -70,9 +73,25 @@ extractSpecifDatatype = (datatype) => {
     datatype.getAttribute("") ? specifDatatype.fractionDigits = datatype.getAttribute("") : '';
     datatype.childElementCount ? specifDatatype.values = extractDataTypeValues(datatype.children) : '';
 
-
-
     return specifDatatype;
+}
+
+getTypeOfDatatype = (datatype) => {
+    let type;
+
+    switch(datatype.tagName) {
+        case "DATATYPE-DEFINITION-BOOLEAN": type = 'xs:boolean'; break; 
+        case "DATATYPE-DEFINITION-DATE": type = 'xs:dateTime'; break;
+        case "DATATYPE-DEFINITION-INTEGER": type = 'xs:integer'; break;
+        case "DATATYPE-DEFINITION-REAL": type = 'xs:double'; break;
+        case "DATATYPE-DEFINITION-STRING": type = 'xs:string'; break;
+        case "DATATYPE-DEFINITION-XHTML": type = 'xhtml'; break;
+        case "DATATYPE-DEFINITION-ENUMERATION": type = 'xs:enumeration'; break;
+
+        default: type = 'xs:string'
+    }
+
+    return type;
 }
 
 extractDataTypeValues = (DataTypeValuesHtmlCollection) => {
