@@ -104,9 +104,11 @@ extractDataTypeValues = (DataTypeValuesHtmlCollection) => {
 }
 
 extractSpecIfValue = (valueDocument) => {
+    
+    if (!valueDocument.getAttribute("IDENTIFIER")) return;
     specifValueObject = {};
-    valueDocument.getAttribute("IDENTIFIER") ?  specifValueObject.id = valueDocument.getAttribute("IDENTIFIER") : '';
-    valueDocument.getAttribute("LONG-NAME") ?   specifValueObject.value = valueDocument.getAttribute("LONG-NAME") : '';
+    valueDocument.getAttribute("IDENTIFIER") ?  specifValueObject.id = valueDocument.getAttribute("IDENTIFIER") : '' ;
+    valueDocument.getAttribute("LONG-NAME") ?   specifValueObject.value = valueDocument.getAttribute("LONG-NAME") : specifValueObject.value = 'Value undefined';
     return specifValueObject;
 
 }
