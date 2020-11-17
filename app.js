@@ -146,10 +146,17 @@ extractSpecIfResourceClass = (resourceClassDocument) => {
     specifResourceClass.description = resourceClassDocument.getAttribute("DESC")
     //specifResourceClass.icon = resourceClassDocument.getAttribute("")
     //specifResourceClass.instantiation = resourceClassDocument.getAttribute("")
-    //specifResourceClass.propertyClasses = resourceClassDocument.getAttribute("")
+    specifResourceClass.propertyClasses = extractResourceClassProperties(resourceClassDocument.getElementsByTagName("SPEC-ATTRIBUTES"))
     specifResourceClass.changedAt = resourceClassDocument.getAttribute("LAST-CHANGE")
     specifResourceClass.description = resourceClassDocument.getAttribute("DESC")
     return specifResourceClass;
+}
+
+extractResourceClassProperties = (propertyClassesDocument) => {
+    propertiesArray = []
+    propertiesArray = extractElementsOutOfHtmlCollection(propertyClassesDocument[0].children)
+    propertiesArray = propertiesArray.map( property => {return property.getAttribute("IDENTIFIER")})
+    return propertiesArray;
 }
 
 extractSpecifStatementClassesFromXmlDoc = (XmlSpecTypeDocument) => {
@@ -190,15 +197,27 @@ extractSpecIfResource = (resourceDocument) => {
     resourceDocument.getAttribute("LONG-NAME") ? specifResource.title = resourceDocument.getAttribute("LONG-NAME") : '';
     resourceDocument.getElementsByTagName("TYPE")[0] ? specifResource.class = resourceDocument.getElementsByTagName("TYPE")[0].children[0].innerHTML : '';
     resourceDocument.getAttribute("") ? specifResource.revision = resourceDocument.getAttribute("") : specifResource.revision = "0";
+    resourceDocument.getElementsByTagName("VALUES")[0].childElementCount ? specifResource.properties = extractResourceProperties(resourceDocument.getElementsByTagName("VALUES")) : '';
     resourceDocument.getAttribute("LAST-CHANGE") ? specifResource.changedAt = resourceDocument.getAttribute("LAST-CHANGE") : '';
     resourceDocument.getAttribute("") ? specifResource.changedBy = resourceDocument.getAttribute("") : '';
-    resourceDocument.childElementCount>1 ? specifResource.properties = extractResourceProperties(resourceDocument.children[1]) : '';
-
+    
     return specifResource;
 }
 
-extractResourceProperties = () => {
+extractResourceProperties = (specObjectsValuesDocument) => {
+    let valuesDoc = specObjectsValuesDocument[0];
+    childrenArray = extractElementsOutOfHtmlCollection(valuesDoc.children);
+    specIfResourcePropertyArray = childrenArray.map(property => {return extractSpecIfProperty(property)});
+    return specIfResourcePropertyArray;
+}
 
+extractSpecIfProperty = (property) => {
+let specifProperty = {};
+property.getElementsByTagName("DEFINITION") ? specifProperty.class = property.getElementsByTagName("DEFINITION")[0].children[0].innerHTML : '';
+property.getAttribute("THE-VALUE") ? specifProperty.value = property.getAttribute("THE-VALUE") : '';
+property.getElementsByTagName("THE-VALUE")[0] ? specifProperty.value = property.getElementsByTagName("THE-VALUE")[0].innerHTML : '';
+property.getElementsByTagName("VALUES")[0] ? specifProperty.value = property.getElementsByTagName("VALUES")[0].children[0].innerHTML : '';
+return specifProperty;
 }
 
 extractSpecifStatementsFromXmlDoc = (XmlDocStatements) => {
@@ -338,7 +357,7 @@ extractSpecAttributeTypeMap = (specTypesDocument, tagName) => {
     let attributeDefinitionMap = {}
     attributeDefinitionArray.forEach(definition => {
         attributeDefinitionMap[definition.getAttribute("IDENTIFIER")]={ 
-                                                                        id : definition.getAttribute("LONG-NAME"),
+                                                                        title : definition.getAttribute("LONG-NAME"),
                                                                         dataType : definition.children[0].children[0].innerHTML,
                                                                         changedAt : definition.getAttribute("LAST-CHANGE"),
 
@@ -349,9 +368,10 @@ extractSpecAttributeTypeMap = (specTypesDocument, tagName) => {
 
 extractPropertyClassesFromSpecAttributeMap = (specAttributeMap) =>{
     specAttributeMapArray = Object.entries(specAttributeMap).map( keyValuePair => keyValuePair[1])
-    propertyClassesObject = {}
-    specAttributeMapArray.forEach(specification => propertyClassesObject[specification.id] = {dataType : specification.dataType, changedAt : specification.changedAt})
-    propertyClasses = Object.entries(propertyClassesObject).map( entry => { return {id: entry[0] , title : "", dataType : entry[1].dataType, changedAt : entry[1].changedAt } })
+    propertyClasses = Object.entries(specAttributeMap).map( entry => { return {id: entry[0] , title : entry[1].title, dataType : entry[1].dataType, changedAt : entry[1].changedAt } })
+    //propertyClassesObject = {}
+    //specAttributeMapArray.forEach(specification => propertyClassesObject[specification.id] = {dataType : specification.dataType, changedAt : specification.changedAt})
+    //propertyClasses = Object.entries(propertyClassesObject).map( entry => { return {id: entry[0] , title : "", dataType : entry[1].dataType, changedAt : entry[1].changedAt } })
     return propertyClasses;
 }
 /* 
