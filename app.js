@@ -70,7 +70,8 @@ extractSpecifDatatype = (datatype) => {
     datatype.getAttribute("MIN") ? specifDatatype.minInclusive = Number(datatype.getAttribute("MIN")) : '';
     datatype.getAttribute("MAX") ? specifDatatype.maxInclusive = Number(datatype.getAttribute("MAX")) : '';
     datatype.getAttribute("MAX-LENGTH") ? specifDatatype.maxLength = Number(datatype.getAttribute("MAX-LENGTH")) : '';
-    datatype.getAttribute("") ? specifDatatype.fractionDigits = datatype.getAttribute("") : '';
+    //datatype.getAttribute("ACCURACY") ? specifDatatype.fractionDigits = Number(datatype.getAttribute("ACCURACY"))-Math.max(datatype.getAttribute("MIN").length,datatype.getAttribute("MAX").length) : '';
+    datatype.getAttribute("ACCURACY") ? specifDatatype.fractionDigits = Number(datatype.getAttribute("ACCURACY")) : '';
     datatype.childElementCount ? specifDatatype.values = extractDataTypeValues(datatype.children) : '';
 
     return specifDatatype;
