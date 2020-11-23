@@ -18,11 +18,6 @@ extractMainSpecifProperties = (XmlDocReqIfHeader) => {
     specIfProeprties.title = XmlDocReqIfHeader[0].getElementsByTagName("TITLE")[0].innerHTML;
     specIfProeprties.description = XmlDocReqIfHeader[0].getElementsByTagName("COMMENT")[0].innerHTML;
     specIfProeprties.$schema = "https://specif.de/v1.0/schema.json";
-    specIfProeprties.rights = {
-        "title": "Creative Commons 4.0 CC BY-SA",
-        "type": "dcterms:rights",
-        "url": "https://creativecommons.org/licenses/by-sa/4.0/"
-    }
     specIfProeprties.createdAt = XmlDocReqIfHeader[0].getElementsByTagName("CREATION-TIME")[0].innerHTML; //Format looks weird, but is like that in reqIf file
     
     return specIfProeprties;
