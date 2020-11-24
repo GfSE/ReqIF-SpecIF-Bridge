@@ -1,11 +1,13 @@
-testTransformReqIfToSpecIf = (ReqIfDocument) => {               
-    const element = extractXmlDocFromString(ReqIfDocument);
+testTransformReqIfToSpecIf = (reqIfDocument) => {               
+    const element = extractXmlDocFromString(reqIfDocument);
     const specIfObject = extractMainSpecifProperties(element.getElementsByTagName("REQ-IF-HEADER"));
     specIfObject.dataTypes = extractSpecifDatatypesFromXmlDoc(element.getElementsByTagName("DATATYPES"));
     specIfObject.propertyClasses = extractSpecifPropertyClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
     specIfObject.resourceClasses = extractSpecifResourceClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
     specIfObject.statementClasses = extractSpecifStatementClassesFromXmlDoc(element.getElementsByTagName("SPEC-TYPES"));
-    specIfObject.resources = extractSpecifResourcesFromXmlDoc(element.getElementsByTagName("SPEC-OBJECTS"));
+    resources = extractSpecifResourcesFromXmlDoc(element.getElementsByTagName("SPEC-OBJECTS"));
+    resources.push(extractRootSpecIfObjectsArray(element.getElementsByTagName("SPECIFICATIONS")))
+    specIfObject.resources = resources.flat();
     specIfObject.statements = extractSpecifStatementsFromXmlDoc(element.getElementsByTagName("SPEC-RELATIONS"));
     specIfObject.hierarchies = extractSpecifHierarchiesFromXmlDoc(element.getElementsByTagName("SPECIFICATIONS"));
     
@@ -179,6 +181,10 @@ extractSpecIfProperty = (property) => {
     return specifProperty;
 }
 
+extractRootSpecIfObjectsArray = (specificationsDocument) => {
+    return extractSpecifResourcesFromXmlDoc(specificationsDocument);
+}
+
 extractSpecifStatementsFromXmlDoc = (XmlDocStatements) => {
     const specifStatementsArray = [];
     const statementsArray = extractElementsOutOfHtmlCollection(XmlDocStatements[0].children)                
@@ -199,12 +205,22 @@ extractSpecIfStatement = (statementDocument) => {
     return specifStatement;
 }
 
-extractSpecifHierarchiesFromXmlDoc = (XmlDocHierarchies) => {
-    const hierarchiesArray = extractElementsOutOfHtmlCollection(XmlDocHierarchies[0].children)
-    const rootElement = hierarchiesArray[0]
-    const specifHierarchiesArray = extractSpecIfSubNodes(rootElement)
-    
+extractSpecifHierarchiesFromXmlDoc = (XmlDocSpecifications) => {
+    const specifHierarchiesArray = [];
+    const specifications = extractElementsOutOfHtmlCollection(XmlDocSpecifications[0].getElementsByTagName("SPECIFICATION"))
+    specifications.forEach( specification => {
+        specifHierarchiesArray.push(extractRootNode(specification))
+    })  
     return specifHierarchiesArray;
+}
+
+extractRootNode = (specificationDocument) => {
+    const specIfRootNode = {};
+    specIfRootNode.id = "R-1";
+    specIfRootNode.resource = specificationDocument.getAttribute("IDENTIFIER");
+    specIfRootNode.changedAt = specificationDocument.getAttribute("LAST-CHANGE");
+    specIfRootNode.nodes = extractSpecIfSubNodes(specificationDocument)
+    return specIfRootNode;
 }
 
 extractSpecIfSubNodes = (rootElement) => {
@@ -249,11 +265,11 @@ extractElementsOutOfHtmlCollection = (htmlCollection) => {
 }
 
 isResourceClass = (classDocument) => {
-    return classDocument.getAttribute("IDENTIFIER").toString().startsWith("RC");
+    return classDocument.tagName === 'SPEC-OBJECT-TYPE' || classDocument.tagName === 'SPECIFICATION-TYPE'
 }
 
 isStatementClass = (classDocument) => {
-    return classDocument.getAttribute("IDENTIFIER").toString().startsWith("SC");
+    return classDocument.tagName === 'SPEC-RELATION-TYPE'
 }
 
 getChildNodeswithTag = (parentDocument, tagName) => {
@@ -264,7 +280,11 @@ extractSpecAttributesMap = (specTypesDocument) => {
     const StringsSpecification = extractSpecAttributeStringsMap(specTypesDocument);
     const XHTMLSpecification = extractSpecAttributeXHTMLMap(specTypesDocument);
     const EnumsSpecification = extractSpecAttributeEnumsMap(specTypesDocument);
-    return Object.assign({}, StringsSpecification, XHTMLSpecification, EnumsSpecification);
+    const DateSpecification = extractSpecAttributeDateMap(specTypesDocument);
+    const BooleanSpecification = extractSpecAttributeBooleanMap(specTypesDocument);
+    const IntegerSpecification = extractSpecAttributeIntegerMap(specTypesDocument);
+    const RealSpecification = extractSpecAttributeRealMap(specTypesDocument);
+    return Object.assign({}, StringsSpecification, XHTMLSpecification, EnumsSpecification, DateSpecification, BooleanSpecification, IntegerSpecification, RealSpecification);
 }
 
 extractSpecAttributeStringsMap = (specTypesDocument) => {
@@ -279,6 +299,22 @@ extractSpecAttributeEnumsMap = (specTypesDocument) => {
     return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-ENUMERATION");
 }
 
+extractSpecAttributeDateMap = (specTypesDocument) => {
+    return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-DATE");
+}
+
+extractSpecAttributeBooleanMap = (specTypesDocument) => {
+    return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-BOOLEAN");
+}
+
+extractSpecAttributeIntegerMap = (specTypesDocument) => {
+    return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-INTEGER");
+}
+
+extractSpecAttributeRealMap = (specTypesDocument) => {
+    return extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-REAL");
+}
+
 extractSpecAttributeTypeMap = (specTypesDocument, tagName) => {
     let attributeDefinition = specTypesDocument.getElementsByTagName(tagName)
     let attributeDefinitionArray = extractElementsOutOfHtmlCollection(attributeDefinition)
@@ -288,14 +324,25 @@ extractSpecAttributeTypeMap = (specTypesDocument, tagName) => {
                                                                         title : definition.getAttribute("LONG-NAME"),
                                                                         dataType : definition.children[0].children[0].innerHTML,
                                                                         changedAt : definition.getAttribute("LAST-CHANGE"),
-
                                                                     } 
-                                                        });
+        // Enumeration have the optional value MULTI-VALUED                                                 
+        definition.getAttribute("MULTI-VALUED")?attributeDefinitionMap[definition.getAttribute("IDENTIFIER")].multipleChoice=true:'';
+                                                                });
     return attributeDefinitionMap;
 }
 
 extractPropertyClassesFromSpecAttributeMap = (specAttributeMap) => {
-    const propertyClasses = Object.entries(specAttributeMap).map( entry => { return {id: entry[0] , title : entry[1].title, dataType : entry[1].dataType, changedAt : entry[1].changedAt } })
+    const propertyClasses = Object.entries(specAttributeMap).map( entry => { 
+        const propertyClass = {};
+
+        propertyClass.id = entry[0];
+        propertyClass.title = entry[1].title;
+        propertyClass.dataType = entry[1].dataType;
+        propertyClass.changedAt = entry[1].changedAt ;
+        entry[1].multipleChoice? propertyClass.multipleChoice = entry[1].multipleChoice: '';
+
+        return propertyClass;
+    })
 
     return propertyClasses;
 }
