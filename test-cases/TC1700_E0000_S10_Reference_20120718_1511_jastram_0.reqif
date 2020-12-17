@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<REQ-IF xmlns="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd">
+  <THE-HEADER>
+    <REQ-IF-HEADER IDENTIFIER="ID_TC1700_ReqIfHeader_1">
+      <CREATION-TIME>2012-07-18T15:11:33.703+02:00</CREATION-TIME>
+      <REQ-IF-TOOL-ID>RMF - Requirements Modeling Framework (http://www.eclipse.org/rmf)</REQ-IF-TOOL-ID>
+      <REQ-IF-VERSION>1.0</REQ-IF-VERSION>
+      <SOURCE-TOOL-ID>RMF - Requirements Modeling Framework (http://www.eclipse.org/rmf)</SOURCE-TOOL-ID>
+      <TITLE>TC 1700 'SpecRelation'</TITLE>
+    </REQ-IF-HEADER>
+  </THE-HEADER>
+  <CORE-CONTENT>
+    <REQ-IF-CONTENT>
+      <DATATYPES>
+        <DATATYPE-DEFINITION-STRING IDENTIFIER="ID_TC1700_DatatypeDefinitionString" LAST-CHANGE="2012-04-07T01:51:37.112+02:00" LONG-NAME="ReqIF.Name" MAX-LENGTH="256"/>
+      </DATATYPES>
+      <SPEC-TYPES>
+        <SPEC-OBJECT-TYPE IDENTIFIER="ID_TC1700_SpecObjectType" LAST-CHANGE="2012-04-07T01:51:37.112+02:00" LONG-NAME="TC1700 SpecObjectType">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="ID_TC1000_AttributeDefinitionString" LAST-CHANGE="2012-04-07T01:51:37.112+02:00" LONG-NAME="TC1000 String">
+              <TYPE>
+                <DATATYPE-DEFINITION-STRING-REF>ID_TC1700_DatatypeDefinitionString</DATATYPE-DEFINITION-STRING-REF>
+              </TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+          </SPEC-ATTRIBUTES>
+        </SPEC-OBJECT-TYPE>
+        <SPECIFICATION-TYPE IDENTIFIER="ID_TC1700_SpecificationType" LAST-CHANGE="2012-04-07T01:51:37.112+02:00" LONG-NAME="TC1700 SpecificationType"/>
+      </SPEC-TYPES>
+      <SPEC-OBJECTS>
+        <SPEC-OBJECT IDENTIFIER="ID_TC1700_SpecObject1" LAST-CHANGE="2012-04-07T01:51:37.112+02:00">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Requirement 1">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>ID_TC1000_AttributeDefinitionString</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+          </VALUES>
+          <TYPE>
+            <SPEC-OBJECT-TYPE-REF>ID_TC1700_SpecObjectType</SPEC-OBJECT-TYPE-REF>
+          </TYPE>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="ID_TC1700_SpecObject2" LAST-CHANGE="2012-04-07T01:51:37.112+02:00">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Requirement 2">
+              <DEFINITION>
+                <ATTRIBUTE-DEFINITION-STRING-REF>ID_TC1000_AttributeDefinitionString</ATTRIBUTE-DEFINITION-STRING-REF>
+              </DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+          </VALUES>
+          <TYPE>
+            <SPEC-OBJECT-TYPE-REF>ID_TC1700_SpecObjectType</SPEC-OBJECT-TYPE-REF>
+          </TYPE>
+        </SPEC-OBJECT>
+      </SPEC-OBJECTS>
+      <SPECIFICATIONS>
+        <SPECIFICATION IDENTIFIER="ID_TC1700_Specification" LAST-CHANGE="2012-04-07T01:51:37.112+02:00">
+          <TYPE>
+            <SPECIFICATION-TYPE-REF>ID_TC1700_SpecificationType</SPECIFICATION-TYPE-REF>
+          </TYPE>
+          <CHILDREN>
+            <SPEC-HIERARCHY IDENTIFIER="ID_TC1700_SpecHierarchy1" LAST-CHANGE="2012-04-07T01:51:37.112+02:00" LONG-NAME="TC1700 SpecHierarchy1">
+              <OBJECT>
+                <SPEC-OBJECT-REF>ID_TC1700_SpecObject1</SPEC-OBJECT-REF>
+              </OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="ID_TC1700_SpecHierarchy2" LAST-CHANGE="2012-04-07T01:51:37.112+02:00" LONG-NAME="TC1700 SpecHierarchy2">
+              <OBJECT>
+                <SPEC-OBJECT-REF>ID_TC1700_SpecObject2</SPEC-OBJECT-REF>
+              </OBJECT>
+            </SPEC-HIERARCHY>
+          </CHILDREN>
+        </SPECIFICATION>
+      </SPECIFICATIONS>
+    </REQ-IF-CONTENT>
+  </CORE-CONTENT>
+</REQ-IF>
