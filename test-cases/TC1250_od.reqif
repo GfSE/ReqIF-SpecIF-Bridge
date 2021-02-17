@@ -49,7 +49,7 @@
                 <ATTRIBUTE-DEFINITION-XHTML-REF>ID_TC1250_AttributeDefinitionXhtml</ATTRIBUTE-DEFINITION-XHTML-REF>
               </DEFINITION>
               <THE-VALUE>
-                <xhtml:div><xhtml:div>START -- <xhtml:strong>Microsoft Word(.doc)</xhtml:strong> -- START</xhtml:div><xhtml:object data="files/word.doc" type="application/msword" ><xhtml:object data="files/word.png" width="48px" type="image/png">This text is shown if altenative image can't be shown:word.doc</xhtml:object></xhtml:object><xhtml:div>END -- <xhtml:strong>Microsoft Word(.doc)</xhtml:strong> -- END</xhtml:div></xhtml:div>
+                <xhtml:div><xhtml:p>START -- <xhtml:strong>Microsoft Word(.doc)</xhtml:strong> -- START</xhtml:p><xhtml:p><xhtml:object data="files/word.doc" type="application/msword" ><xhtml:object data="files/word.png" width="48px" type="image/png">This text is shown if altenative image can't be shown:word.doc</xhtml:object></xhtml:object></xhtml:p><xhtml:p>END -- <xhtml:strong>Microsoft Word(.doc)</xhtml:strong> -- END</xhtml:p></xhtml:div>
               </THE-VALUE>
             </ATTRIBUTE-VALUE-XHTML>
           </VALUES>
@@ -64,7 +64,7 @@
                 <ATTRIBUTE-DEFINITION-XHTML-REF>ID_TC1250_AttributeDefinitionXhtml</ATTRIBUTE-DEFINITION-XHTML-REF>
               </DEFINITION>
               <THE-VALUE>
-                <xhtml:div><xhtml:div>START -- <xhtml:strong>Microsoft Word(.docx)</xhtml:strong> -- START</xhtml:div><xhtml:object data="files/word.docx" type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"><xhtml:object data="files/word.png" width="48px" type="image/png">This text is shown if altenative image can't be shown:word.docx</xhtml:object></xhtml:object><xhtml:div>END -- <xhtml:strong>Microsoft Word(.docx)</xhtml:strong> -- END</xhtml:div></xhtml:div>
+                <xhtml:div><xhtml:p>START -- <xhtml:strong>Microsoft Word(.docx)</xhtml:strong> -- START</xhtml:p><xhtml:p><xhtml:object data="files/word.docx" type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"><xhtml:object data="files/word.png" width="48px" type="image/png">This text is shown if altenative image can't be shown:word.docx</xhtml:object></xhtml:object></xhtml:p><xhtml:p>END -- <xhtml:strong>Microsoft Word(.docx)</xhtml:strong> -- END</xhtml:p></xhtml:div>
               </THE-VALUE>
             </ATTRIBUTE-VALUE-XHTML>
           </VALUES>
@@ -79,7 +79,7 @@
                 <ATTRIBUTE-DEFINITION-XHTML-REF>ID_TC1250_AttributeDefinitionXhtml</ATTRIBUTE-DEFINITION-XHTML-REF>
               </DEFINITION>
               <THE-VALUE>
-                <xhtml:div><xhtml:div>START -- <xhtml:strong>Microsoft Excel(.xls)</xhtml:strong> -- START</xhtml:div><xhtml:object data="files/excel.xls" type="application/vnd.ms-excel" ><xhtml:object data="files/excel.png" type="image/png" width="48px">This text is shown if altenative image can't be shown:excel.xls</xhtml:object></xhtml:object><xhtml:div>END -- <xhtml:strong>Microsoft Excel(.xls)</xhtml:strong> -- END</xhtml:div></xhtml:div>
+                <xhtml:div><xhtml:p>START -- <xhtml:strong>Microsoft Excel(.xls)</xhtml:strong> -- START</xhtml:p><xhtml:p><xhtml:object data="files/excel.xls" type="application/vnd.ms-excel" ><xhtml:object data="files/excel.png" type="image/png" width="48px">This text is shown if altenative image can't be shown:excel.xls</xhtml:object></xhtml:object></xhtml:p><xhtml:p>END -- <xhtml:strong>Microsoft Excel(.xls)</xhtml:strong> -- END</xhtml:p></xhtml:div>
               </THE-VALUE>
             </ATTRIBUTE-VALUE-XHTML>
           </VALUES>
@@ -94,7 +94,7 @@
                 <ATTRIBUTE-DEFINITION-XHTML-REF>ID_TC1250_AttributeDefinitionXhtml</ATTRIBUTE-DEFINITION-XHTML-REF>
               </DEFINITION>
               <THE-VALUE>
-                <xhtml:div><xhtml:div>START -- <xhtml:strong>Microsoft Excel(.xlsx)</xhtml:strong> -- START</xhtml:div><xhtml:object data="files/excel.xlsx" type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ><xhtml:object data="files/excel.png" width="48px" type="image/png" >This text is shown if altenative image can't be shown:excel.xlsx</xhtml:object></xhtml:object><xhtml:div>END -- <xhtml:strong>Microsoft Excel(.xlsx)</xhtml:strong> -- END</xhtml:div></xhtml:div>
+                <xhtml:div><xhtml:p>START -- <xhtml:strong>Microsoft Excel(.xlsx)</xhtml:strong> -- START</xhtml:p><xhtml:p><xhtml:object data="files/excel.xlsx" type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ><xhtml:object data="files/excel.png" width="48px" type="image/png" >This text is shown if altenative image can't be shown:excel.xlsx</xhtml:object></xhtml:object></xhtml:p><xhtml:p>END -- <xhtml:strong>Microsoft Excel(.xlsx)</xhtml:strong> -- END</xhtml:p></xhtml:div>
               </THE-VALUE>
             </ATTRIBUTE-VALUE-XHTML>
           </VALUES>
@@ -109,7 +109,7 @@
                 <ATTRIBUTE-DEFINITION-XHTML-REF>ID_TC1250_AttributeDefinitionXhtml</ATTRIBUTE-DEFINITION-XHTML-REF>
               </DEFINITION>
               <THE-VALUE>
-                <xhtml:div><xhtml:div>START -- <xhtml:strong>Microsoft Powerpoint(.ppt)</xhtml:strong> -- START</xhtml:div><xhtml:object data="files/powerpoint.ppt" type="application/vnd.ms-powerpoint" ><xhtml:object data="files/powerpoint.png" width="48px" type="image/png" >This text is shown if altenative image can't be shown:powerpoint.ppt</xhtml:object></xhtml:object><xhtml:div>END -- <xhtml:strong>Microsoft Powerpoint(.ppt)</xhtml:strong> -- END</xhtml:div></xhtml:div>
+                <xhtml:div><xhtml:p>START -- <xhtml:strong>Microsoft Powerpoint(.ppt)</xhtml:strong> -- START</xhtml:p><xhtml:p><xhtml:object data="files/powerpoint.ppt" type="application/vnd.ms-powerpoint" ><xhtml:object data="files/powerpoint.png" width="48px" type="image/png" >This text is shown if altenative image can't be shown:powerpoint.ppt</xhtml:object></xhtml:object></xhtml:p><xhtml:p>END -- <xhtml:strong>Microsoft Powerpoint(.ppt)</xhtml:strong> -- END</xhtml:p></xhtml:div>
               </THE-VALUE>
             </ATTRIBUTE-VALUE-XHTML>
           </VALUES>
@@ -124,7 +124,7 @@
                 <ATTRIBUTE-DEFINITION-XHTML-REF>ID_TC1250_AttributeDefinitionXhtml</ATTRIBUTE-DEFINITION-XHTML-REF>
               </DEFINITION>
               <THE-VALUE>
-                <xhtml:div><xhtml:div>START -- <xhtml:strong>Microsoft Powerpoint(.pptx)</xhtml:strong> -- START</xhtml:div><xhtml:object data="files/powerpoint.pptx" type="application/vnd.openxmlformats-officedocument.presentationml.presentation" ><xhtml:object data="files/powerpoint.png" type="image/png" width="48px">This text is shown if altenative image can't be shown:powerpoint.pptx</xhtml:object></xhtml:object><xhtml:div>END -- <xhtml:strong>Microsoft Powerpoint(.pptx)</xhtml:strong> -- END</xhtml:div></xhtml:div>
+                <xhtml:div><xhtml:p>START -- <xhtml:strong>Microsoft Powerpoint(.pptx)</xhtml:strong> -- START</xhtml:p><xhtml:p><xhtml:object data="files/powerpoint.pptx" type="application/vnd.openxmlformats-officedocument.presentationml.presentation" ><xhtml:object data="files/powerpoint.png" type="image/png" width="48px">This text is shown if altenative image can't be shown:powerpoint.pptx</xhtml:object></xhtml:object></xhtml:p><xhtml:p>END -- <xhtml:strong>Microsoft Powerpoint(.pptx)</xhtml:strong> -- END</xhtml:p></xhtml:div>
               </THE-VALUE>
             </ATTRIBUTE-VALUE-XHTML>
           </VALUES>
