@@ -1,0 +1,15 @@
+/* 
+############################ UI ###########################################
+ */
+
+function getInputValue() {
+    const element = document.getElementById('input');
+    return element.value;
+}
+
+function transform() {
+    const input = getInputValue();
+    const specIf = transformReqIf2SpecIf(input);
+    let element = document.getElementById('output');
+    element.innerHTML = JSON.stringify(specIf, null, '\t');
+}
