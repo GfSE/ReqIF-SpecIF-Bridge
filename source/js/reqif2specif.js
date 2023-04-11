@@ -15,11 +15,10 @@
 ########################## Main #########################################
 */
 function transformReqif2Specif(reqifDoc,options) {
-	const RE_DateTime = /[0-9-]{4,}(T[0-9:]{2,}(\.[0-9]+)?)?(Z|\+[0-9:]{2,}|\-[0-9:]{2,})?/,
-		RE_NS_LINK = /\sxmlns:(.*?)=\".*?\"/;
+	const RE_NS_LINK = /\sxmlns:(.*?)=\".*?\"/;
 	
     if( typeof(options)!='object' ) options = {};
-    if( typeof(options.translateTitle2Specif)!='function' ) options.translateTitle2Specif = function(ti) {return ti};
+    if( typeof(options.translateTitle)!='function' ) options.translateTitle = function(ti) {return ti};
 
     const xmlDoc = parse(reqifDoc);
 
@@ -43,6 +42,18 @@ function transformReqif2Specif(reqifDoc,options) {
         xhr.response.hierarchies = extractHierarchies(xmlDoc.getElementsByTagName("SPECIFICATIONS"));
     };
 
+    // get project title from hierarchy roots in case of default;
+    // for example the ReqIF exports from Cameo do not have a TITLE:
+    if (!xhr.response.title) {
+        let ti = '', r;
+        xhr.response.hierarchies.forEach((h) => {
+            r = itemById(xhr.response.resources, h.resource);
+            ti += (ti.length > 0 ? ', ' : '') + r.title;
+        });
+        xhr.response.title = ti;
+        console.info('Project title assembled from ReqIF SPECIFICATION roots');
+    };
+
 //  console.info(xhr);
     return xhr;
 
@@ -60,7 +71,7 @@ function extractMetaData(header) {
         description: header[0].getElementsByTagName("COMMENT")[0] && header[0].getElementsByTagName("COMMENT")[0].innerHTML || '',
         generator: 'reqif2specif',
         $schema: "https://specif.de/v1.0/schema.json",
-        createdAt: addTimezoneIfMissing(header[0].getElementsByTagName("CREATION-TIME")[0].innerHTML)
+        createdAt: header[0].getElementsByTagName("CREATION-TIME")[0].innerHTML
     });
 };
 function extractDatatypes(xmlDatatypes) {
@@ -72,7 +83,7 @@ function extractDatatypes(xmlDatatypes) {
             type: getTypeOfDatatype(datatype),
             title: datatype.getAttribute("LONG-NAME") || '',
             description: datatype.getAttribute("DESC") || '',
-            changedAt: addTimezoneIfMissing(datatype.getAttribute("LAST-CHANGE") || '')
+            changedAt: datatype.getAttribute("LAST-CHANGE") || ''
         };
         if( datatype.getAttribute("MIN") ) specifDatatype.minInclusive = Number(datatype.getAttribute("MIN"));
         if( datatype.getAttribute("MAX") ) specifDatatype.maxInclusive = Number(datatype.getAttribute("MAX"));
@@ -113,7 +124,7 @@ function extractPropertyClasses(xmlSpecTypes) {
         let propertyClasses = Object.entries(specAttributeMap).map( entry => { 
             let propertyClass = {
                 id: entry[0],
-                title: options.translateTitle2Specif( entry[1].title ),
+                title: options.translateTitle( entry[1].title ),
                 dataType: entry[1].dataType,
                 changedAt: entry[1].changedAt
             };
@@ -143,7 +154,7 @@ function extractPropertyClasses(xmlSpecTypes) {
                     {
                         title: definition.getAttribute("LONG-NAME"),
                         dataType: definition.children[0].children[0].innerHTML,
-                        changedAt: addTimezoneIfMissing(definition.getAttribute("LAST-CHANGE")),
+                        changedAt: definition.getAttribute("LAST-CHANGE"),
                     };
 
                 // Enumerations have an optional attribute MULTI-VALUED:  
@@ -193,7 +204,7 @@ function extractElementClass(xmlSpecType) {
     const specifElementClass = {
         id: xmlSpecType.getAttribute("IDENTIFIER"),
         title: xmlSpecType.getAttribute("LONG-NAME") || xmlSpecType.getAttribute("IDENTIFIER"),
-        changedAt: addTimezoneIfMissing(xmlSpecType.getAttribute("LAST-CHANGE"))
+        changedAt: xmlSpecType.getAttribute("LAST-CHANGE")
     };
     if( xmlSpecType.getAttribute("DESC") ) 
         specifElementClass.description = xmlSpecType.getAttribute("DESC");
@@ -214,7 +225,7 @@ function extractResources(xmlSpecObjects) {
         let specifResource = {
             id: xmlSpecObject.getAttribute("IDENTIFIER"),
             title: xmlSpecObject.getAttribute("LONG-NAME") || xmlSpecObject.getAttribute("IDENTIFIER"),
-            changedAt: addTimezoneIfMissing(xmlSpecObject.getAttribute("LAST-CHANGE"))
+            changedAt: xmlSpecObject.getAttribute("LAST-CHANGE")
         };
         specifResource['class'] = xmlSpecObject.getElementsByTagName("TYPE")[0].children[0].innerHTML;
         //xmlSpecObject.getElementsByTagName("VALUES")[0].childElementCount ? specifResource.properties = extractProperties(xmlSpecObject.getElementsByTagName("VALUES")) : '';
@@ -232,7 +243,7 @@ function extractStatements(xmlSpecRelations) {
             id: xmlSpecRelation.getAttribute("IDENTIFIER"),
             subject: xmlSpecRelation.getElementsByTagName("SOURCE")[0].children[0].innerHTML,
             object: xmlSpecRelation.getElementsByTagName("TARGET")[0].children[0].innerHTML,
-            changedAt: addTimezoneIfMissing(xmlSpecRelation.getAttribute("LAST-CHANGE"))
+            changedAt: xmlSpecRelation.getAttribute("LAST-CHANGE")
         };
         specifStatement['class'] = xmlSpecRelation.getElementsByTagName("TYPE")[0].children[0].innerHTML;
         let values = xmlSpecRelation.getElementsByTagName("VALUES");
@@ -250,17 +261,26 @@ function extractProperties(specAttributes) {
 	return list;
 
     function extractSpecIfProperty(property) {
-        let specifProperty = {};
-    /*  // Provide the id, even though it is not required by SpecIF:
-        // The attribute-value id is not required by ReqIF, 
-        // ToDo: check wether it *may* be specified, at all ...  
-        specifProperty.id = property.getAttribute("IDENTIFIER"); */
+        let specifProperty = {}, pC, dT;
+        /*  // Provide the id, even though it is not required by SpecIF:
+            // The attribute-value id is not required by ReqIF, 
+            // ToDo: check wether it *may* be specified, at all ...  
+            specifProperty.id = property.getAttribute("IDENTIFIER"); */
         specifProperty['class'] = property.getElementsByTagName("DEFINITION")[0].children[0].innerHTML;
-	/*  ToDo: Check whether ReaIF ATTRIBUTES can have an individual LONG-NAME ..
-        if( property.getAttribute("LONG-NAME") ) 
-            specifProperty.title = options.translateTitle2Specif( property.getAttribute("LONG-NAME") ); */
-        if( property.getAttribute("THE-VALUE") ) 
+        /*  ToDo: Check whether ReqIF ATTRIBUTES can have an individual LONG-NAME ..
+            if( property.getAttribute("LONG-NAME") ) 
+                specifProperty.title = options.translateTitle2Specif( property.getAttribute("LONG-NAME") ); */
+        if (property.getAttribute("THE-VALUE")) {
             specifProperty.value = property.getAttribute("THE-VALUE");
+
+            pC = itemById(xhr.response.propertyClasses, specifProperty['class']);
+            dT = itemById(xhr.response.dataTypes, pC.dataType);
+//          console.debug('maxL', dT, pC, specifProperty.value, specifProperty.value.length);
+            if( typeof(dT.maxLength)=='number' && dT.maxLength < specifProperty.value.length ) {
+                console.warn("Truncated ReqIF Attribute with value '" + specifProperty.value + "' to the specified maxLength of " + dT.maxLength + " characters");
+                specifProperty.value = specifProperty.value.substring(0, dT.maxLength);
+            };
+        }
         // XHTML:
         else if( property.getElementsByTagName("THE-VALUE")[0] ) 
             specifProperty.value = removeNamespace(property.getElementsByTagName("THE-VALUE")[0].innerHTML);
@@ -281,7 +301,7 @@ function extractHierarchies(xmlSpecifications) {
         return {
             id: "HR-" + rId,
             resource: rId,
-            changedAt: addTimezoneIfMissing(xmlSpecification.getAttribute("LAST-CHANGE")),
+            changedAt: xmlSpecification.getAttribute("LAST-CHANGE"),
             nodes: extractSpecIfSubNodes(xmlSpecification)
         };
 
@@ -300,7 +320,7 @@ function extractHierarchies(xmlSpecifications) {
                 let specifHierarchy = {
                     id: hierarchyDocument.getAttribute("IDENTIFIER"),
                     resource: hierarchyDocument.getElementsByTagName("OBJECT")[0].firstElementChild.innerHTML,
-                    changedAt: addTimezoneIfMissing(hierarchyDocument.getAttribute("LAST-CHANGE"))
+                    changedAt: hierarchyDocument.getAttribute("LAST-CHANGE")
                 };
                 
                 let specifSubnodesArray = extractSpecIfSubNodes(hierarchyDocument);
@@ -321,6 +341,14 @@ function parse(string) {
 /* 
 ########################## Tools #########################################  
 */
+    function itemById(L, id) {
+        if (L && id) {
+            // given an ID of an item in a list, return it's index:
+            id = id.trim();
+            for (var i = L.length - 1; i > -1; i--)
+                if (L[i].id == id) return L[i]   // return list item
+        };
+    }
     /*
     //      (xmlns:.*?=)\\".*?\\" Regular Expression to match namespace links (at beginning)
     String.prototype.removeNamespace = function(){
@@ -343,17 +371,5 @@ function parse(string) {
 		    });
 		    return namespace;
 	    }
-    }
-    function addTimezoneIfMissing(dt) {
-	    if( dt ) {
-            let match = RE_DateTime.exec(dt);
-            // ReqIF data generated by PTC Integrity has been observed to have timestamps without timezone.
-		    // If date and time are specified, but no timezone, add "Z" for Greenwich time:
-		    if( match[0] && match[1] && !match[3] ) {
-			    console.info("ReqIF to SpecIF transformation: Added missing time-zone to "+dt);
-			    return dt + "Z";
-		    };
-	    };
-	    return dt;
     }
 }
